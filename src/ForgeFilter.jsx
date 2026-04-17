@@ -731,6 +731,97 @@ const APPROACH_RULES = [
   "Unanimous council consent means unanimous — not a majority and a reluctant yes.",
 ];
 
+
+const WIFE_TIERS = [
+  {
+    id: "t1",
+    tier: "TIER 1",
+    name: "Hard Filters",
+    subtitle: "Pass/fail. One failure = exit. No exceptions.",
+    color: "#c0321a",
+    criteria: [
+      { id: "w1a", text: "Wants children — actively, not 'someday maybe'", tag: "Biological" },
+      { id: "w1b", text: "No serious unresolved fertility issues", tag: "Biological" },
+      { id: "w1c", text: "Not currently married or in serious entanglement", tag: "Character" },
+      { id: "w1d", text: "No pattern of male-hopping or serial short relationships", tag: "Character" },
+      { id: "w1e", text: "No history of false accusations or weaponizing legal systems against men", tag: "Character" },
+      { id: "w1f", text: "No addictions — substances, attention-seeking, social media performance", tag: "Character" },
+      { id: "w1g", text: "Does not require external validation to feel stable", tag: "Character" },
+      { id: "w1h", text: "Comfortable with masculine leadership — not performing submission, not fighting it", tag: "Orientation" },
+      { id: "w1i", text: "Does not believe men are inherently oppressive or broken", tag: "Orientation" },
+      { id: "w1j", text: "Not completely estranged from her own family without legitimate reason", tag: "Family" },
+    ]
+  },
+  {
+    id: "t2",
+    tier: "TIER 2",
+    name: "High-Weight Traits",
+    subtitle: "Multiple weak scores here = wrong woman for the Longhouse.",
+    color: "#9a6020",
+    criteria: [
+      { id: "w2a", text: "Respects tradition, lineage, and the idea that culture is worth preserving", tag: "Values" },
+      { id: "w2b", text: "Has some spiritual or transcendent framework — not flatly materialist", tag: "Values" },
+      { id: "w2c", text: "Believes a family has a shape — roles, structure, not just two people bumping around", tag: "Values" },
+      { id: "w2d", text: "Emotionally regulated — can sit with discomfort without detonating", tag: "Temperament" },
+      { id: "w2e", text: "Low drama baseline — conflict handled directly, not through manipulation", tag: "Temperament" },
+      { id: "w2f", text: "Loyal under pressure — holds shape when things get hard", tag: "Temperament" },
+      { id: "w2g", text: "Can run a household — or clearly capable of learning and willing to", tag: "Practical" },
+      { id: "w2h", text: "Has a relationship with physical work, food, nourishment — not afraid of a kitchen", tag: "Practical" },
+      { id: "w2i", text: "Not purely career-identity driven to the point that family becomes secondary", tag: "Practical" },
+      { id: "w2j", text: "Can navigate group dynamics without fracturing them", tag: "Social" },
+      { id: "w2k", text: "Respects the male space — doesn't need to colonize or compete with it", tag: "Social" },
+    ]
+  },
+  {
+    id: "t3",
+    tier: "TIER 3",
+    name: "Longhouse Fit",
+    subtitle: "Longer-read signals. Emerge through time and small tests.",
+    color: "#7a8040",
+    criteria: [
+      { id: "w3a", text: "Talks about her children's future, not just her own ambitions", tag: "Legacy" },
+      { id: "w3b", text: "Has thought about what she wants to pass down — values, skills, culture", tag: "Legacy" },
+      { id: "w3c", text: "Responds positively or curiously to intentional community and kin networks", tag: "Legacy" },
+      { id: "w3d", text: "Integrates into a group — doesn't fragment it", tag: "Tribal" },
+      { id: "w3e", text: "Supports your relationships with your brothers — doesn't compete for your bandwidth", tag: "Tribal" },
+      { id: "w3f", text: "Would this woman take a vow seriously? Treats commitments as binding, not provisional", tag: "Oath" },
+      { id: "w3g", text: "How does she talk about her past promises? Past relationships?", tag: "Oath" },
+    ]
+  },
+  {
+    id: "t4",
+    tier: "TIER 4",
+    name: "Green Flags",
+    subtitle: "Additive value. Signals you are dealing with rare material.",
+    color: "#4a8a6a",
+    criteria: [
+      { id: "w4a", text: "Values natural living, real food, physical health as a way of life — not a trend", tag: "Lifestyle" },
+      { id: "w4b", text: "Has a skill set with genuine practical value — medical, agricultural, culinary, craft", tag: "Skill" },
+      { id: "w4c", text: "Has a close female friend who is also high-character — can vet and be vetted", tag: "Character" },
+      { id: "w4d", text: "Has worked through something hard and come out more grounded, not more fragile", tag: "Fortitude" },
+      { id: "w4e", text: "Responds to your intensity and vision with curiosity rather than anxiety", tag: "Fit" },
+      { id: "w4f", text: "Has some relationship with ancestral identity, heritage, or rootedness", tag: "Heritage" },
+    ]
+  }
+];
+
+const WIFE_DISQUALIFIERS = [
+  { id: "wd1", text: "Active feminist ideology — men are oppressive, hierarchy is violence" },
+  { id: "wd2", text: "History of false accusations or legal weaponization against men" },
+  { id: "wd3", text: "Children from multiple fathers with no stable structure" },
+  { id: "wd4", text: "Addicted to external validation — social media follower count as identity" },
+  { id: "wd5", text: "Refuses any discussion of traditional roles or family structure" },
+  { id: "wd6", text: "Completely estranged from family with no legitimate reason" },
+  { id: "wd7", text: "Cannot handle mild friction without detonating or withdrawing" },
+  { id: "wd8", text: "Treats your brotherhood as a threat to your relationship with her" },
+];
+
+const CONQUEST_FILTER = [
+  "Am I acting from frame or thirst?",
+  "Would the man who already owns his Longhouse do this?",
+  "Is this woman a net gain to the fortress or a risk?",
+];
+
 function getStageStatus(checks, stageId) {
   const stage = STAGES.find(s => s.id === stageId);
   if (!stage) return "pending";
@@ -783,6 +874,9 @@ export default function ForgeFilter() {
   const [candidates, setCandidates] = useState([]);
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [newName, setNewName] = useState("");
+  const [wifeCandidates, setWifeCandidates] = useState([]);
+  const [selectedWifeIdx, setSelectedWifeIdx] = useState(null);
+  const [newWifeName, setNewWifeName] = useState("");
 
   const addCandidate = () => {
     if (!newName.trim()) return;
@@ -827,6 +921,61 @@ export default function ForgeFilter() {
       ...c,
       collapsed: { ...c.collapsed, [section]: !c.collapsed[section] }
     }));
+  };
+
+  const selectedWife = selectedWifeIdx !== null ? wifeCandidates[selectedWifeIdx] : null;
+
+  const initialWife = (name) => ({ name, checks: {}, disqs: {}, notes: {}, conquest: {}, collapsed: {} });
+
+  const addWifeCandidate = () => {
+    if (!newWifeName.trim()) return;
+    setWifeCandidates(prev => [...prev, initialWife(newWifeName.trim())]);
+    setSelectedWifeIdx(wifeCandidates.length);
+    setNewWifeName("");
+  };
+
+  const removeWifeCandidate = (idx) => { setWifeCandidates(prev => prev.filter((_, i) => i !== idx)); setSelectedWifeIdx(null); };
+
+  const updateWife = (fn) => { setWifeCandidates(prev => prev.map((c, i) => i === selectedWifeIdx ? fn(c) : c)); };
+
+  const toggleWifeCheck = (id) => {
+    updateWife(c => {
+      const cur = c.checks[id];
+      const next = cur === "pass" ? "fail" : cur === "fail" ? undefined : "pass";
+      const checks = { ...c.checks };
+      if (next === undefined) delete checks[id]; else checks[id] = next;
+      return { ...c, checks };
+    });
+  };
+
+  const toggleWifeDisq = (id) => { updateWife(c => ({ ...c, disqs: { ...c.disqs, [id]: !c.disqs[id] } })); };
+  const setWifeNote = (section, val) => { updateWife(c => ({ ...c, notes: { ...c.notes, [section]: val } })); };
+  const toggleWifeCollapse = (section) => { updateWife(c => ({ ...c, collapsed: { ...c.collapsed, [section]: !c.collapsed?.[section] } })); };
+  const toggleWifeConquest = (i) => {
+    updateWife(c => {
+      const cur = c.conquest?.[i];
+      const next = cur === true ? false : cur === false ? undefined : true;
+      const conquest = { ...c.conquest };
+      if (next === undefined) delete conquest[i]; else conquest[i] = next;
+      return { ...c, conquest };
+    });
+  };
+
+  const getWifeStatus = (c) => {
+    if (WIFE_DISQUALIFIERS.some(d => c.disqs[d.id])) return "fail";
+    const t1fails = WIFE_TIERS[0].criteria.filter(cr => c.checks[cr.id] === "fail").length;
+    if (t1fails > 0) return "fail";
+    const anyPass = WIFE_TIERS.some(t => t.criteria.some(cr => c.checks[cr.id] === "pass"));
+    return anyPass ? "pass" : "pending";
+  };
+
+  const getWifeVerdict = (c) => {
+    if (WIFE_DISQUALIFIERS.some(d => c.disqs[d.id])) return "✗";
+    const t1fails = WIFE_TIERS[0].criteria.filter(cr => c.checks[cr.id] === "fail").length;
+    if (t1fails > 0) return "✗";
+    const total = WIFE_TIERS.reduce((acc, t) => acc + t.criteria.filter(cr => c.checks[cr.id] === "pass").length, 0);
+    if (total > 15) return "✓";
+    return "—";
   };
 
   const selected = selectedIdx !== null ? candidates[selectedIdx] : null;
@@ -876,7 +1025,7 @@ export default function ForgeFilter() {
         </div>
 
         <div className="tabs">
-          {[["score","Score Candidate"],["pipeline","Pipeline"],["approach","Approach Guide"]].map(([id, label]) => (
+          {[["score","Score Candidate"],["pipeline","Pipeline"],["wife","Wife Vetting"],["approach","Approach Guide"]].map(([id, label]) => (
             <button key={id} className={`tab ${activeTab === id ? "active" : ""}`} onClick={() => setActiveTab(id)}>{label}</button>
           ))}
         </div>
@@ -1134,6 +1283,172 @@ export default function ForgeFilter() {
         )}
 
         {/* APPROACH TAB */}
+
+        {activeTab === "wife" && (
+          <>
+            <div className="summary-panel">
+              <div className="section-label">Active Candidates</div>
+              <div className="candidate-bar">
+                <input className="candidate-input" placeholder="Enter candidate name..." value={newWifeName} onChange={e => setNewWifeName(e.target.value)} onKeyDown={e => e.key === "Enter" && addWifeCandidate()} />
+                <button className="btn" onClick={addWifeCandidate}>+ Add</button>
+              </div>
+              {wifeCandidates.length > 0 && (
+                <div className="candidate-list">
+                  {wifeCandidates.map((c, i) => (
+                    <div key={i} className={`candidate-chip ${selectedWifeIdx === i ? "selected" : ""}`} onClick={() => setSelectedWifeIdx(i)}>
+                      <div className={`chip-status ${getWifeStatus(c)}`}></div>
+                      {c.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {!selectedWife && (
+              <div style={{textAlign:"center",padding:"40px 0",color:"#3a2a18"}}>
+                <div style={{fontFamily:"Cinzel, serif",fontSize:"13px",letterSpacing:"2px"}}>ADD A CANDIDATE TO BEGIN VETTING</div>
+              </div>
+            )}
+
+            {selectedWife && (
+              <>
+                <div className="summary-panel">
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                    <div>
+                      <div style={{fontFamily:"Cinzel, serif",fontSize:"16px",color:"#c8b89a",letterSpacing:"1px"}}>{selectedWife.name}</div>
+                      <div style={{fontSize:"12px",color:"#4a3a28",marginTop:"2px",fontStyle:"italic"}}>Vetting Record</div>
+                    </div>
+                    <button className="btn btn-danger" onClick={() => removeWifeCandidate(selectedWifeIdx)}>Remove</button>
+                  </div>
+                  <div className="summary-grid">
+                    <div className="summary-stat">
+                      <div className="stat-number">{WIFE_TIERS.reduce((acc, t) => acc + t.criteria.filter(c => selectedWife.checks[c.id] === "pass").length, 0)}</div>
+                      <div className="stat-label">Green Checks</div>
+                    </div>
+                    <div className="summary-stat">
+                      <div className="stat-number" style={{color:"#c0321a"}}>{WIFE_DISQUALIFIERS.filter(d => selectedWife.disqs[d.id]).length}</div>
+                      <div className="stat-label">Disq. Triggered</div>
+                    </div>
+                    <div className="summary-stat">
+                      <div className="stat-number" style={{fontSize:"16px",marginTop:"4px"}}>{getWifeVerdict(selectedWife)}</div>
+                      <div className="stat-label">Verdict</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conquest Filter */}
+                <div className="stage-card">
+                  <div className="stage-header" onClick={() => toggleWifeCollapse("conquest")}>
+                    <div className="stage-title-group">
+                      <div className="stage-number" style={{color:"#c0521a"}}>⚡</div>
+                      <div className="stage-name">Conquest Filter</div>
+                    </div>
+                    <div style={{display:"flex",gap:"10px",alignItems:"center"}}>
+                      <div style={{fontSize:"11px",fontFamily:"Cinzel, serif",color:"#4a3a28",letterSpacing:"1px"}}>RUN BEFORE ANY ESCALATION</div>
+                      <button className="toggle-btn">{selectedWife.collapsed?.conquest ? "▼" : "▲"}</button>
+                    </div>
+                  </div>
+                  {!selectedWife.collapsed?.conquest && (
+                    <div className="stage-body">
+                      {CONQUEST_FILTER.map((q, i) => (
+                        <div key={i} className="criteria-item" onClick={() => toggleWifeConquest(i)}>
+                          <div className={`check-box ${selectedWife.conquest?.[i] === true ? "checked-pass" : selectedWife.conquest?.[i] === false ? "checked-fail" : ""}`}>
+                            {selectedWife.conquest?.[i] === true && <span className="check-icon" style={{color:"#4a9a3a"}}>✓</span>}
+                            {selectedWife.conquest?.[i] === false && <span className="check-icon" style={{color:"#c03020"}}>✗</span>}
+                          </div>
+                          <div className="criteria-text">{q}</div>
+                        </div>
+                      ))}
+                      <div style={{fontSize:"13px",color:"#6a4a2a",fontStyle:"italic",marginTop:"12px"}}>If any answer is shaky — stop. Reset. Proceed only from clarity.</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tier cards */}
+                {WIFE_TIERS.map(tier => {
+                  const passed = tier.criteria.filter(c => selectedWife.checks[c.id] === "pass").length;
+                  const failed = tier.criteria.filter(c => selectedWife.checks[c.id] === "fail").length;
+                  const collapsed = selectedWife.collapsed?.[tier.id];
+                  return (
+                    <div className="stage-card" key={tier.id}>
+                      <div className="stage-header" onClick={() => toggleWifeCollapse(tier.id)}>
+                        <div className="stage-title-group">
+                          <div className="stage-number" style={{color: tier.color, borderColor: tier.color + "44"}}>{tier.tier}</div>
+                          <div>
+                            <div className="stage-name">{tier.name}</div>
+                          </div>
+                        </div>
+                        <div style={{display:"flex",gap:"10px",alignItems:"center"}}>
+                          <span style={{fontSize:"11px",fontFamily:"Cinzel, serif",color:"#4a3a28"}}>{passed}/{tier.criteria.length}</span>
+                          {failed > 0 && tier.id === "t1" && <span className="stage-badge badge-fail">FAIL</span>}
+                          <button className="toggle-btn">{collapsed ? "▼" : "▲"}</button>
+                        </div>
+                      </div>
+                      {!collapsed && (
+                        <div className="stage-body">
+                          <div style={{fontSize:"13px",color:"#4a3a28",fontStyle:"italic",marginBottom:"12px"}}>{tier.subtitle}</div>
+                          {tier.criteria.map(c => {
+                            const val = selectedWife.checks[c.id];
+                            return (
+                              <div key={c.id} className="criteria-item" onClick={() => toggleWifeCheck(c.id)}>
+                                <div className={`check-box ${val === "pass" ? "checked-pass" : val === "fail" ? "checked-fail" : ""}`}>
+                                  {val === "pass" && <span className="check-icon" style={{color:"#4a9a3a"}}>✓</span>}
+                                  {val === "fail" && <span className="check-icon" style={{color:"#c03020"}}>✗</span>}
+                                </div>
+                                <div>
+                                  <div className={`criteria-text ${val === "pass" ? "checked-pass" : val === "fail" ? "checked-fail" : ""}`}
+                                    style={{textDecoration: val === "fail" ? "line-through" : "none"}}>
+                                    {c.text}
+                                  </div>
+                                  <div className="criteria-tag">#{c.tag}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                          <div className="notes-label">Field Notes — {tier.name}</div>
+                          <textarea className="notes-area" placeholder="Observations, dates, specific incidents..." value={selectedWife.notes?.[tier.id] || ""} onChange={e => setWifeNote(tier.id, e.target.value)} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Disqualifiers */}
+                <div className="stage-card">
+                  <div className="stage-header" onClick={() => toggleWifeCollapse("disq")} style={{borderBottom: WIFE_DISQUALIFIERS.some(d => selectedWife.disqs[d.id]) ? "1px solid #4a1010" : "1px solid #1e1208"}}>
+                    <div className="stage-title-group">
+                      <div className="stage-number" style={{color:"#8a2a1a",borderColor:"#3a1010"}}>⚠</div>
+                      <div className="stage-name">Hard Disqualifiers</div>
+                    </div>
+                    <div style={{display:"flex",gap:"10px",alignItems:"center"}}>
+                      {WIFE_DISQUALIFIERS.some(d => selectedWife.disqs[d.id]) && <span className="stage-badge badge-disq">DISQUALIFIED</span>}
+                      <button className="toggle-btn">{selectedWife.collapsed?.disq ? "▼" : "▲"}</button>
+                    </div>
+                  </div>
+                  {!selectedWife.collapsed?.disq && (
+                    <div className="stage-body">
+                      <div style={{fontSize:"13px",color:"#4a3a28",fontStyle:"italic",marginBottom:"12px"}}>Any single trigger ends candidacy immediately.</div>
+                      {WIFE_DISQUALIFIERS.map(d => (
+                        <div key={d.id} className="disq-item" onClick={() => toggleWifeDisq(d.id)}>
+                          <div className={`disq-box ${selectedWife.disqs[d.id] ? "triggered" : ""}`}>
+                            {selectedWife.disqs[d.id] && <span style={{color:"#c03020",fontSize:"11px"}}>✗</span>}
+                          </div>
+                          <div className={`disq-text ${selectedWife.disqs[d.id] ? "triggered" : ""}`}>{d.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{marginTop:"20px"}}>
+                  <div className="notes-label">Master Record — {selectedWife.name}</div>
+                  <textarea className="notes-area" style={{minHeight:"100px"}} placeholder="Overall assessment, context, key observations..." value={selectedWife.notes?.master || ""} onChange={e => setWifeNote("master", e.target.value)} />
+                </div>
+              </>
+            )}
+          </>
+        )}
+
         {activeTab === "approach" && (
           <>
             <div className="guide-section">
